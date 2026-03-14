@@ -1,6 +1,14 @@
 # yoani-pc-redirect-chrext
 
-Chrome Extension that redirects configured hosts to replacement hosts using `declarativeNetRequest` static rules.
+Chrome Extension that redirects Yoani sites from their `sp.` hosts to the standard desktop hosts.
+
+Targets:
+
+- `sp.equal-love.jp` -> `equal-love.jp` (`=LOVE`)
+- `sp.not-equal-me.jp` -> `not-equal-me.jp` (`≠ME`)
+- `sp.nearly-equal-joy.jp` -> `nearly-equal-joy.jp` (`≒JOY`)
+
+The extension preserves the rest of the URL and only replaces the host.
 
 ## Stack
 
@@ -46,14 +54,41 @@ Edit `src/config/redirects.ts`.
 ```ts
 export const redirectRules = [
   {
-    fromHost: "old.example.com",
-    toHost: "new.example.com",
-    schemes: ["http", "https"]
-  }
+    fromHost: "sp.equal-love.jp",
+    toHost: "equal-love.jp",
+    schemes: ["http", "https"],
+  },
+  {
+    fromHost: "sp.not-equal-me.jp",
+    toHost: "not-equal-me.jp",
+    schemes: ["http", "https"],
+  },
+  {
+    fromHost: "sp.nearly-equal-joy.jp",
+    toHost: "nearly-equal-joy.jp",
+    schemes: ["http", "https"],
+  },
 ];
 ```
 
 This replaces only the host. The remaining URL suffix is preserved by the generated regex rule.
+
+## Release
+
+Pushing a tag like `v0.1.0` triggers GitHub Actions to:
+
+1. verify the source,
+2. build the Chrome extension,
+3. create a GitHub Release,
+4. upload a ready-to-extract ZIP asset.
+
+To use the release asset:
+
+1. Download the ZIP from the GitHub Release.
+2. Extract it locally.
+3. Open `chrome://extensions`.
+4. Enable Developer mode.
+5. Click Load unpacked and select the extracted folder.
 
 ## Verification Commands
 
