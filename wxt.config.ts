@@ -11,7 +11,6 @@ export default defineConfig({
     short_name: "PC Redirect",
     description:
       "Redirects configured hosts to replacement hosts with declarativeNetRequest.",
-    version: "0.1.0",
     permissions: ["declarativeNetRequest"],
     host_permissions: hostMatchPatterns,
     declarative_net_request: {

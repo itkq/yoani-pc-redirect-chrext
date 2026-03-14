@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.18.3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify tag matches package version
+        run: |
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          TAG_NAME="${GITHUB_REF_NAME#v}"
+          if [ "$PACKAGE_VERSION" != "$TAG_NAME" ]; then
+            echo "Tag version ($TAG_NAME) does not match package.json version ($PACKAGE_VERSION)"
+            exit 1
+          fi
+
+      - name: Verify source
+        run: |
+          pnpm lint
+          pnpm typecheck
+          pnpm test
+
+      - name: Build release ZIP
+        run: pnpm zip
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: .output/*.zip
+          generate_release_notes: true
+          body: |
+            Chrome extension ZIP built from tag `${{ github.ref_name }}`.
+
+            Usage:
+            1. Download the ZIP asset.
+            2. Extract it locally.
+            3. Open `chrome://extensions`.
+            4. Enable Developer mode.
+            5. Click Load unpacked and select the extracted folder.
